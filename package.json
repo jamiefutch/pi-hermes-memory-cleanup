@@ -1,0 +1,43 @@
+{
+  "name": "@jamiefutch/pi-hermes-memory-cleanup",
+  "version": "0.1.0",
+  "description": "Pi extension: utility for cleaning up and optimizing Hermes persistent memory storage.",
+  "type": "module",
+  "keywords": [
+    "pi",
+    "pi-package",
+    "hermes",
+    "memory",
+    "cleanup",
+    "optimization"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamiefutch/pi-hermes-memory-cleanup.git"
+  },
+  "homepage": "https://github.com/jamiefutch/pi-hermes-memory-cleanup#readme",
+  "bugs": {
+    "url": "https://github.com/jamiefutch/pi-hermes-memory-cleanup/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "start": "tsx src/cli.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.23.11",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
