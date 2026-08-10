@@ -1,16 +1,9 @@
 {
   "name": "@jamiefutch/pi-hermes-memory-cleanup",
   "version": "0.1.0",
-  "description": "Pi extension: utility for cleaning up and optimizing Hermes persistent memory storage.",
+  "description": "Pi package: utility for cleaning up and optimizing Hermes persistent memory storage used by the Pi coding agent.",
   "type": "module",
-  "keywords": [
-    "pi",
-    "pi-package",
-    "hermes",
-    "memory",
-    "cleanup",
-    "optimization"
-  ],
+  "keywords": ["pi", "pi-package"],
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -23,18 +16,21 @@
   "engines": {
     "node": ">=22"
   },
-  "files": [
-    "src",
-    "LICENSE",
-    "README.md"
-  ],
+  "files": ["extensions", "src", "LICENSE", "README.md"],
   "scripts": {
     "start": "tsx src/cli.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
+  "pi": {
+    "extensions": ["./extensions"]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
   "devDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
     "@types/node": "^22.0.0",
     "tsx": "^4.23.11",
     "typescript": "^5.6.0",
