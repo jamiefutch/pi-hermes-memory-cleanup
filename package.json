@@ -1,6 +1,6 @@
 {
   "name": "@jamiefutch/pi-hermes-memory-cleanup",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Pi package: utility for cleaning up and optimizing Hermes persistent memory storage used by the Pi coding agent.",
   "type": "module",
   "keywords": [
