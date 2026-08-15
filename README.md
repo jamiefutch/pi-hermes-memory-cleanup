@@ -29,7 +29,7 @@ Use this as the source of truth for how Hermes stores, consolidates, and loads m
 |------|---------|
 | `.pi/agents.md` | Development guidelines for this agent |
 | `.pi/locations.md` | Where files, source, and docs live |
-| `src/` | Implementation (`analyze.ts` storage stats, `parse.ts` entry parser, `dupes.ts` duplicate detection, `cli.ts` report) |
+| `src/` | Implementation (`analyze.ts` storage stats, `parse.ts` entry parser, `dupes.ts` duplicate detection, `superseded.ts` supersession detection, `cli.ts` report) |
 | `test/` | Vitest tests |
 | `planning/` | Notes and task lists |
 
@@ -57,6 +57,7 @@ npm run typecheck
 - **Memory entries** — per-file entry counts, bytes, and estimated injected-context tokens (~4 chars/token)
 - **Stalest entries** — the five entries with the oldest `last=` activity dates
 - **Duplicates** — exact duplicates (identical normalized text) and near-duplicates (Jaccard/overlap similarity ≥ 0.6 with ≥ 5 shared tokens)
+- **Superseded entries** — older entries whose content is largely contained (overlap ≥ 0.7) in a strictly newer, larger entry; candidates for retirement
 
 Entries are parsed from the standard Hermes markdown format: text blocks separated by `§` lines, with optional `<!-- created=YYYY-MM-DD, last=YYYY-MM-DD -->` metadata trailers.
 

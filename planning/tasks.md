@@ -19,7 +19,7 @@
 
 - [x] Read and parse `MEMORY.md`, `USER.md`, `failures.md` sections
 - [x] Detect duplicate and near-duplicate memory entries
-- [ ] Detect outdated or superseded entries
+- [x] Detect outdated or superseded entries
 - [x] Estimate token cost of each loaded entry
 - [x] Report findings with entry IDs/previews
 

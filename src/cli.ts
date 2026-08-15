@@ -2,6 +2,7 @@ import path from 'node:path';
 import { analyzeHermesStorage, getHermesRoot, listHermesFiles } from './analyze.js';
 import { parseHermesFiles, type MemoryEntry } from './parse.js';
 import { findDuplicates } from './dupes.js';
+import { findSuperseded } from './superseded.js';
 
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -102,11 +103,30 @@ function printDuplicatesSection(lines: string[], entries: readonly MemoryEntry[]
   }
 }
 
+function printSupersededSection(lines: string[], entries: readonly MemoryEntry[]): void {
+  const superseded = findSuperseded(entries);
+  lines.push('');
+  lines.push('Superseded entries (newer entry contains this content):');
+  if (superseded.length === 0) {
+    lines.push('  (none found)');
+    return;
+  }
+  for (const s of superseded) {
+    const pct = Math.round(s.overlap * 100);
+    lines.push(
+      `  ~${pct}%   ${shortName(s.entry.file)}#${s.entry.index} → superseded by ${shortName(s.supersededBy.file)}#${s.supersededBy.index}`,
+    );
+    lines.push(`         old (created=${formatDate(s.entry.created)}): ${preview(s.entry.text)}`);
+    lines.push(`         new (created=${formatDate(s.supersededBy.created)}): ${preview(s.supersededBy.text)}`);
+  }
+}
+
 export function printStats(): string {
   const lines: string[] = [];
   printStorageSection(lines);
   const entries = printEntriesSection(lines, getHermesRoot());
   printDuplicatesSection(lines, entries);
+  printSupersededSection(lines, entries);
   return lines.join('\n');
 }
 
