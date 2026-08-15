@@ -40,6 +40,8 @@
 
 ## Phase 5: Pi Extension
 
-- [x] `/memory-cleanup` command (menu + report / prune / dedupe passthrough; memory-* family)
+- [x] `/memory-cleanup` command (menu + report / limits / trim / prune / dedupe passthrough; memory-* family)
+- [x] Limits view (Hermes injection caps vs usage)
+- [x] Trim operation (interactive entry picker, backup + confirm)
 - [x] Manifest + settings wiring verified (extension loads at pi startup)
 - [x] Publish to npm

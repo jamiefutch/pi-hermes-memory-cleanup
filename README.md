@@ -29,18 +29,21 @@ Use this as the source of truth for how Hermes stores, consolidates, and loads m
 |------|---------|
 | `.pi/agents.md` | Development guidelines for this agent |
 | `.pi/locations.md` | Where files, source, and docs live |
-| `src/` | Implementation (`analyze.ts` storage stats, `parse.ts` entry parser, `dupes.ts` duplicate detection, `superseded.ts` supersession detection, `cli.ts` report) |
+| `src/` | Implementation (`analyze.ts` storage stats, `parse.ts` entry parser, `dupes.ts` duplicate detection, `superseded.ts` supersession detection, `prune.ts` recovery pruning, `dedupe.ts` entry removal, `limits.ts` injection caps, `trim.ts` entry picker planning, `cli.ts` report) |
 | `test/` | Vitest tests |
 | `planning/` | Notes and task lists |
 
 ## Development
 
 ```bash
-# Install dependencies
-npm install
-
 # Read-only report against ~/.pi/agent/pi-hermes-memory
 npm start
+
+# Configured injection caps vs actual usage
+npx tsx src/cli.ts limits
+
+# Pick specific entries to stop injecting (dry-run default)
+npx tsx src/cli.ts trim --confirm --remove MEMORY.md#3 --remove USER.md#1
 
 # Preview recovery-file pruning (keeps newest 10 per file)
 npm run prune
@@ -53,9 +56,6 @@ npm run dedupe
 
 # Apply removal (backs up affected files first)
 npx tsx src/cli.ts dedupe --confirm
-
-# Manually remove specific entries by ref
-npx tsx src/cli.ts dedupe --confirm --remove MEMORY.md#3 --remove USER.md#1
 
 # Run tests
 npm test
@@ -75,8 +75,11 @@ All mutating commands are **dry-run by default** and require `--confirm`. `dedup
 - **Storage stats** — sizes of `MEMORY.md`, `USER.md`, `failures.md`, recovery/retired backup files, and the SQLite databases
 - **Memory entries** — per-file entry counts, bytes, and estimated injected-context tokens (~4 chars/token)
 - **Stalest entries** — the five entries with the oldest `last=` activity dates
+- **Largest entries** — the five entries with the highest estimated token cost
 - **Duplicates** — exact duplicates (identical normalized text) and near-duplicates (Jaccard/overlap similarity ≥ 0.6 with ≥ 5 shared tokens)
 - **Superseded entries** — older entries whose content is largely contained (overlap ≥ 0.7) in a strictly newer, larger entry; candidates for retirement
+
+`limits` shows Hermes injection configuration (`~/.pi/agent/hermes-memory-config.json`): `memoryMode`, `memoryPolicyStyle`, per-file char caps vs actual usage with near-cap warnings, and the failures.md injection filters (max age / max entries).
 
 Entries are parsed from the standard Hermes markdown format: text blocks separated by `§` lines, with optional `<!-- created=YYYY-MM-DD, last=YYYY-MM-DD -->` metadata trailers.
 
@@ -85,11 +88,13 @@ Entries are parsed from the standard Hermes markdown format: text blocks separat
 Install the package (or keep the local path in `settings.json`) and use inside pi:
 
 ```
-/memory-cleanup                        interactive menu (report / prune / dedupe)
+/memory-cleanup                        interactive menu (report / limits / trim / dedupe / prune)
 /memory-cleanup report                 show the full report in the TUI
-/memory-cleanup prune --keep 5         dry-run recovery prune
-/memory-cleanup prune --confirm        delete old recovery files
+/memory-cleanup limits                 injection caps vs usage
+/memory-cleanup trim --confirm --remove MEMORY.md#3
+                                       remove specific entries (backs up first)
 /memory-cleanup dedupe --confirm       back up + remove duplicate/superseded entries
+/memory-cleanup prune --confirm        delete old recovery files
 ```
 
 ## License

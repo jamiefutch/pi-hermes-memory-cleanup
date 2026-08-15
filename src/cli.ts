@@ -5,6 +5,8 @@ import { findDuplicates } from './dupes.js';
 import { findSuperseded } from './superseded.js';
 import { planRecoveryPrune, executePrune } from './prune.js';
 import { planDedupe, executeDedupe, parseEntryRef, type EntryRef } from './dedupe.js';
+import { loadHermesLimits, computeUsage, hermesConfigPath } from './limits.js';
+import { planTrim, entriesByCost } from './trim.js';
 
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -77,6 +79,12 @@ function printEntriesSection(lines: string[], root: string): MemoryEntry[] {
     for (const e of stale) {
       lines.push(`  [${shortName(e.file)}#${e.index}] last=${formatDate(e.last)} — ${preview(e.text)}`);
     }
+  }
+
+  lines.push('');
+  lines.push('Largest entries (by est. tokens):');
+  for (const e of entriesByCost(entries).slice(0, 5)) {
+    lines.push(`  ~${String(e.estTokens).padStart(4)} tok  ${shortName(e.file)}#${e.index} — ${preview(e.text, 60)}`);
   }
   return [...entries];
 }
@@ -210,8 +218,83 @@ export function runDedupe(args: CliArgs): string {
   return lines.join('\n');
 }
 
+export function runLimits(): string {
+  const root = getHermesRoot();
+  const stats = analyzeHermesStorage(root);
+  const limits = loadHermesLimits();
+  const usage = computeUsage(limits, {
+    memoryMd: stats.activeFiles.memoryMd,
+    userMd: stats.activeFiles.userMd,
+  });
+
+  const lines: string[] = [];
+  lines.push(`Hermes config: ${hermesConfigPath()}`);
+  lines.push(`  memoryMode:            ${limits.memoryMode}`);
+  lines.push(`  memoryPolicyStyle:     ${limits.memoryPolicyStyle}`);
+  lines.push('');
+  lines.push('Injection caps vs actual usage:');
+  for (const u of usage) {
+    const warn = u.pct >= 90 ? '  ⚠️ near cap' : '';
+    lines.push(`  ${u.label.padEnd(10)} ${formatBytes(u.usedChars)} / ${formatBytes(u.capChars)} (${u.pct}%)${warn}`);
+  }
+  lines.push('');
+  lines.push('failures.md injection filter:');
+  lines.push(`  max age:     ${limits.failureInjectionMaxAgeDays} days`);
+  lines.push(`  max entries: ${limits.failureInjectionMaxEntries}`);
+  lines.push('');
+  lines.push('Edit the config file to tune; defaults are 5000 chars per file.');
+  return lines.join('\n');
+}
+
+export function runTrim(args: CliArgs): string {
+  const root = getHermesRoot();
+  const files = listHermesFiles(root);
+  const markdownFiles = [files.memoryMd, files.userMd, files.failuresMd];
+  const { entries } = parseHermesFiles(markdownFiles);
+
+  const refs: EntryRef[] = [];
+  for (const ref of args.remove) {
+    const parsed = parseEntryRef(ref, markdownFiles);
+    if (!parsed) return `Invalid --remove ref: ${ref} (expected e.g. MEMORY.md#3)`;
+    refs.push(parsed);
+  }
+  if (refs.length === 0) {
+    const lines = ['Trim: pick entries to remove by ref. Largest entries:', ''];
+    for (const e of entriesByCost(entries).slice(0, 10)) {
+      lines.push(`  ~${String(e.estTokens).padStart(4)} tok  ${shortName(e.file)}#${e.index} — ${preview(e.text, 60)}`);
+    }
+    lines.push('');
+    lines.push('Usage: trim --confirm --remove MEMORY.md#3 [--remove USER.md#1 ...]');
+    return lines.join('\n');
+  }
+
+  const plan = planTrim(entries, refs);
+  const lines: string[] = [];
+  let total = 0;
+  for (const [file, indices] of plan) {
+    const list = [...indices].sort((a, b) => a - b);
+    total += list.length;
+    lines.push(`${path.basename(file)}: remove entries ${list.map((i) => `#${i}`).join(', ')}`);
+  }
+  if (total === 0) lines.push('Nothing to remove (refs invalid or would empty a file).');
+
+  if (!args.confirm) {
+    lines.push('');
+    lines.push('DRY RUN — re-run with --confirm to apply (a backup is taken first).');
+    return lines.join('\n');
+  }
+
+  const result = executeDedupe(plan, root, false);
+  lines.push(`Backup: ${result.backupDir ?? '(none)'}`);
+  lines.push(`REMOVED ${result.entriesRemoved} entries from ${result.filesChanged.length} files, saved ${formatBytes(result.bytesSaved)}`);
+  return lines.join('\n');
+}
+
 const USAGE = `Usage:
   report                      Storage + entry + duplicate report (default)
+  limits                      Configured injection caps vs actual usage
+  trim --confirm --remove FILE#IDX ...
+                              Remove specific entries (largest-first picker list)
   prune [--keep N] [--confirm]   Delete old recovery files (keeps newest N=10 per file)
   dedupe [--confirm] [--remove FILE#IDX ...]
                               Remove exact-dupe extras + superseded entries
@@ -221,6 +304,8 @@ All mutating commands are DRY RUN unless --confirm is passed.`;
 export function main(): void {
   const args = parseArgs(process.argv.slice(2));
   if (args.command === 'report') console.log(printStats());
+  else if (args.command === 'limits') console.log(runLimits());
+  else if (args.command === 'trim') console.log(runTrim(args));
   else if (args.command === 'prune') console.log(runPrune(args));
   else if (args.command === 'dedupe') console.log(runDedupe(args));
   else console.log(USAGE);

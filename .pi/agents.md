@@ -72,7 +72,7 @@ Manual removal of `.recovery-*` / `.retired-*` files outside the CLI requires an
 This package's pi command surface belongs to the **pi-hermes-memory `memory-*` family**. Consistency rules:
 
 1. **Namespace**: all commands are named `memory-<verb>` (e.g. `memory-cleanup`). Never introduce a `hermes-*` or other prefix — the palette groups by prefix, and the sibling package pi-hermes-memory owns `memory-*` (`memory-consolidate`, `memory-insights`, `memory-pin`, `memory-skills`, `memory-interview`, `memory-preview-context`, `memory-index-sessions`, `memory-switch-project`).
-2. **One command per package feature**: this package registers exactly one command, `memory-cleanup`. Sub-operations (report / prune / dedupe) are exposed two ways — an interactive `ctx.ui.select` menu when invoked with no args in the TUI, and arg passthrough (`/memory-cleanup prune --confirm`) for scripted use. Do not register additional top-level commands without a user request.
+2. **One command per package feature**: this package registers exactly one command, `memory-cleanup`. Sub-operations (report / limits / trim / prune / dedupe) are exposed two ways — an interactive `ctx.ui.select` menu when invoked with no args in the TUI, and arg passthrough (`/memory-cleanup prune --confirm`) for scripted use. Do not register additional top-level commands without a user request.
 3. **Menu = operations list**: when a new operation is added to the CLI, add a matching entry to the extension menu and the HELP text in the same commit.
 4. **Descriptions**: one sentence, imperative, matching family tone (e.g. "Audit and safely clean Hermes memory storage (report, prune, dedupe)").
 5. **Docs in lockstep**: any command/menu change updates README.md (Pi Extension section), the architecture table below, and `planning/tasks.md`.
@@ -88,8 +88,10 @@ This package's pi command surface belongs to the **pi-hermes-memory `memory-*` f
 | `src/prune.ts` | Recovery-file pruning (plan/execute) |
 | `src/backup.ts` | Backup-before-mutation into `.cleanup-backups/` |
 | `src/dedupe.ts` | Duplicate/superseded entry removal (plan/execute) |
-| `src/cli.ts` | `report` / `prune` / `dedupe` subcommands |
-| `extensions/pi-hermes-memory-cleanup.ts` | `/memory-cleanup` pi command (memory-* family) wrapping the CLI |
+| `src/limits.ts` | Hermes injection caps (hermes-memory-config.json) vs usage |
+| `src/trim.ts` | Arbitrary entry-pick removal planning (never blanks a file) |
+| `src/cli.ts` | `report` / `limits` / `trim` / `prune` / `dedupe` subcommands |
+| `extensions/pi-hermes-memory-cleanup.ts` | `/memory-cleanup` pi command (memory-* family) wrapping the CLI, with interactive menu (Report / Limits / Trim / Dedupe / Prune) |
 
 Published as `@jamiefutch/pi-hermes-memory-cleanup`. The `pi.extensions` manifest points at the exact file `extensions/pi-hermes-memory-cleanup.ts`.
 
