@@ -17,11 +17,11 @@
 
 ## Phase 2: Hermes Analysis Tools
 
-- [ ] Read and parse `MEMORY.md`, `USER.md`, `failures.md` sections
-- [ ] Detect duplicate and near-duplicate memory entries
+- [x] Read and parse `MEMORY.md`, `USER.md`, `failures.md` sections
+- [x] Detect duplicate and near-duplicate memory entries
 - [ ] Detect outdated or superseded entries
-- [ ] Estimate token cost of each loaded entry
-- [ ] Report findings with entry IDs/previews
+- [x] Estimate token cost of each loaded entry
+- [x] Report findings with entry IDs/previews
 
 ## Phase 3: Safe Cleanup Tools
 

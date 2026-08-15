@@ -1,4 +1,7 @@
-import { analyzeHermesStorage, getHermesRoot } from './analyze.js';
+import path from 'node:path';
+import { analyzeHermesStorage, getHermesRoot, listHermesFiles } from './analyze.js';
+import { parseHermesFiles, type MemoryEntry } from './parse.js';
+import { findDuplicates } from './dupes.js';
 
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -8,11 +11,22 @@ export function formatBytes(bytes: number): string {
   return `${value.toFixed(1)} ${units[i]}`;
 }
 
-export function printStats(): string {
+function shortName(file: string): string {
+  return path.basename(file);
+}
+
+function preview(text: string, max = 70): string {
+  const oneLine = text.replace(/<!--[\s\S]*?-->/g, '').replace(/\s+/g, ' ').trim();
+  return oneLine.length <= max ? oneLine : `${oneLine.slice(0, max - 1)}…`;
+}
+
+function formatDate(iso: string | null): string {
+  return iso ?? 'unknown';
+}
+
+function printStorageSection(lines: string[]): void {
   const root = getHermesRoot();
   const stats = analyzeHermesStorage(root);
-
-  const lines: string[] = [];
   lines.push(`Hermes storage: ${root}`);
   lines.push('');
   lines.push('Active markdown files:');
@@ -27,10 +41,72 @@ export function printStats(): string {
   lines.push('Databases:');
   lines.push(`  memory.db  : ${formatBytes(stats.databases.memoryDb)}`);
   lines.push(`  sessions.db: ${formatBytes(stats.databases.sessionsDb)}`);
-  lines.push('');
-  const backupTotal = stats.recoveryFiles.bytes + stats.retiredFiles.bytes;
-  lines.push(`Backup total: ${formatBytes(backupTotal)}`);
+}
 
+function printEntriesSection(lines: string[], root: string): MemoryEntry[] {
+  const files = listHermesFiles(root);
+  const markdownFiles = [files.memoryMd, files.userMd, files.failuresMd];
+  const { entries, perFile } = parseHermesFiles(markdownFiles);
+
+  lines.push('');
+  lines.push('Memory entries:');
+  if (entries.length === 0) {
+    lines.push('  (none found)');
+    return [];
+  }
+
+  let totalTokens = 0;
+  for (const [file, info] of Object.entries(perFile)) {
+    lines.push(
+      `  ${shortName(file)}: ${info.count} entries, ${formatBytes(info.bytes)}, ~${info.estTokens.toLocaleString()} tokens`,
+    );
+    totalTokens += info.estTokens;
+  }
+  lines.push(`  Total injected context: ~${totalTokens.toLocaleString()} tokens`);
+  lines.push('');
+
+  const stale = [...entries]
+    .filter((e) => e.last !== null)
+    .sort((a, b) => (a.last! < b.last! ? -1 : 1))
+    .slice(0, 5);
+  if (stale.length > 0) {
+    lines.push('Stalest entries (by last activity):');
+    for (const e of stale) {
+      lines.push(`  [${shortName(e.file)}#${e.index}] last=${formatDate(e.last)} — ${preview(e.text)}`);
+    }
+  }
+  return [...entries];
+}
+
+function printDuplicatesSection(lines: string[], entries: readonly MemoryEntry[]): void {
+  const dupes = findDuplicates(entries);
+  lines.push('');
+  lines.push('Duplicates:');
+  if (dupes.exact.length === 0 && dupes.near.length === 0) {
+    lines.push('  (none found)');
+    return;
+  }
+
+  for (const group of dupes.exact) {
+    const refs = group.map((e) => `${shortName(e.file)}#${e.index}`).join(' = ');
+    lines.push(`  EXACT  ${refs}`);
+    lines.push(`         ${preview(group[0].text)}`);
+  }
+  for (const pair of dupes.near) {
+    const pct = Math.round(pair.similarity * 100);
+    lines.push(
+      `  ~${pct}%   ${shortName(pair.a.file)}#${pair.a.index} ≈ ${shortName(pair.b.file)}#${pair.b.index}`,
+    );
+    lines.push(`         A: ${preview(pair.a.text)}`);
+    lines.push(`         B: ${preview(pair.b.text)}`);
+  }
+}
+
+export function printStats(): string {
+  const lines: string[] = [];
+  printStorageSection(lines);
+  const entries = printEntriesSection(lines, getHermesRoot());
+  printDuplicatesSection(lines, entries);
   return lines.join('\n');
 }
 

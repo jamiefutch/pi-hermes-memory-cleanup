@@ -10,3 +10,6 @@ coverage/
 *.swp
 *.swo
 *~
+*.code-workspace
+.pi/
+planning/
