@@ -2,7 +2,8 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { printStats, runPrune, runDedupe, parseArgs, type CliArgs } from "../src/cli.js";
 
 /**
- * /hermes-cleanup — Hermes memory storage report and safe cleanup.
+ * /memory-cleanup — Hermes memory storage report and safe cleanup.
+ * Part of the pi-hermes-memory command family (memory-*).
  *
  * No args (TUI): interactive menu — Report / Prune / Dedupe.
  * With args:     direct passthrough — report | prune [--keep N] [--confirm]
@@ -11,8 +12,8 @@ import { printStats, runPrune, runDedupe, parseArgs, type CliArgs } from "../src
  * Mutating operations are dry-run unless confirmed.
  */
 export default function piHermesMemoryCleanup(pi: ExtensionAPI) {
-	pi.registerCommand("hermes-cleanup", {
-		description: "Hermes memory report and cleanup (menu, or: report | prune | dedupe)",
+	pi.registerCommand("memory-cleanup", {
+		description: "Audit and safely clean Hermes memory storage (report, prune, dedupe)",
 		handler: async (args, ctx) => {
 			const trimmed = args.trim();
 			if (!trimmed && ctx.mode === "tui") {
@@ -36,7 +37,7 @@ function runDirect(args: string, ctx: any): void {
 		if (ctx.mode === "tui") ctx.ui.editor(`Hermes Cleanup — ${parsed.command}`, output);
 		else ctx.ui.notify(output, "info");
 	} catch (err) {
-		ctx.ui.notify(`hermes-cleanup failed: ${err}`, "error");
+		ctx.ui.notify(`memory-cleanup failed: ${err}`, "error");
 	}
 }
 
@@ -63,7 +64,7 @@ async function showMenu(ctx: any): Promise<void> {
 				await ctx.ui.editor("Hermes Cleanup Help", HELP);
 			}
 		} catch (err) {
-			ctx.ui.notify(`hermes-cleanup failed: ${err}`, "error");
+			ctx.ui.notify(`memory-cleanup failed: ${err}`, "error");
 		}
 	}
 }
@@ -106,6 +107,6 @@ Every mutating operation shows a dry-run preview and asks for
 confirmation before changing anything.
 
 CLI equivalents (also usable as args):
-  /hermes-cleanup report
-  /hermes-cleanup prune --keep 5 --confirm
-  /hermes-cleanup dedupe --confirm --remove MEMORY.md#3`;
+  /memory-cleanup report
+  /memory-cleanup prune --keep 5 --confirm
+  /memory-cleanup dedupe --confirm --remove MEMORY.md#3`;

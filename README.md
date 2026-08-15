@@ -85,10 +85,11 @@ Entries are parsed from the standard Hermes markdown format: text blocks separat
 Install the package (or keep the local path in `settings.json`) and use inside pi:
 
 ```
-/hermes-cleanup                        show the full report in the TUI
-/hermes-cleanup prune --keep 5         dry-run recovery prune
-/hermes-cleanup prune --confirm        delete old recovery files
-/hermes-cleanup dedupe --confirm       back up + remove duplicate/superseded entries
+/memory-cleanup                        interactive menu (report / prune / dedupe)
+/memory-cleanup report                 show the full report in the TUI
+/memory-cleanup prune --keep 5         dry-run recovery prune
+/memory-cleanup prune --confirm        delete old recovery files
+/memory-cleanup dedupe --confirm       back up + remove duplicate/superseded entries
 ```
 
 ## License

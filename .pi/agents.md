@@ -79,7 +79,7 @@ Manual removal of `.recovery-*` / `.retired-*` files outside the CLI requires an
 | `src/backup.ts` | Backup-before-mutation into `.cleanup-backups/` |
 | `src/dedupe.ts` | Duplicate/superseded entry removal (plan/execute) |
 | `src/cli.ts` | `report` / `prune` / `dedupe` subcommands |
-| `extensions/pi-hermes-memory-cleanup.ts` | `/hermes-cleanup` pi command wrapping the CLI |
+| `extensions/pi-hermes-memory-cleanup.ts` | `/memory-cleanup` pi command (memory-* family) wrapping the CLI |
 
 Published as `@jamiefutch/pi-hermes-memory-cleanup`. The `pi.extensions` manifest points at the exact file `extensions/pi-hermes-memory-cleanup.ts`.
 

@@ -40,6 +40,6 @@
 
 ## Phase 5: Pi Extension
 
-- [x] `/hermes-cleanup` command (report / prune / dedupe passthrough)
+- [x] `/memory-cleanup` command (menu + report / prune / dedupe passthrough; memory-* family)
 - [x] Manifest + settings wiring verified (extension loads at pi startup)
 - [x] Publish to npm
