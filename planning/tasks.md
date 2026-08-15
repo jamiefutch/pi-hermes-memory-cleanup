@@ -42,4 +42,4 @@
 
 - [x] `/hermes-cleanup` command (report / prune / dedupe passthrough)
 - [x] Manifest + settings wiring verified (extension loads at pi startup)
-- [ ] Publish to npm
+- [x] Publish to npm
