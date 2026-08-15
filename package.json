@@ -5,6 +5,9 @@
   "type": "module",
   "keywords": ["pi", "pi-package"],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jamiefutch/pi-hermes-memory-cleanup.git"
