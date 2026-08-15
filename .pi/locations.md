@@ -4,10 +4,13 @@
 
 - Root: `/Users/jamiefutch/projects/personal/pi-hermes-memory-cleanup`
 - Source: `/Users/jamiefutch/projects/personal/pi-hermes-memory-cleanup/src`
+- Extension: `/Users/jamiefutch/projects/personal/pi-hermes-memory-cleanup/extensions`
 - Tests: `/Users/jamiefutch/projects/personal/pi-hermes-memory-cleanup/test`
-- Planning docs: `/Users/jamiefutch/projects/personal/pi-hermes-memory-cleanup/planning`
+- Planning docs: `/Users/jamiefutch/projects/personal/pi-hermes-memory-cleanup/planning` (gitignored except tracked files)
 - Agent guidelines: `/Users/jamiefutch/projects/personal/pi-hermes-memory-cleanup/.pi/agents.md`
 - This file: `/Users/jamiefutch/projects/personal/pi-hermes-memory-cleanup/.pi/locations.md`
+- npm: `@jamiefutch/pi-hermes-memory-cleanup`
+- Repo: `git@github.com:jamiefutch/pi-hermes-memory-cleanup.git`
 
 ## Hermes Reference Source
 
@@ -38,11 +41,15 @@ Files of interest:
 - `MEMORY.md` — global/project memories (loaded into context)
 - `USER.md` — user preferences (loaded into context)
 - `failures.md` — failure/correction memories (loaded into context)
+- `retired-failures.md` — retired failure entries (not loaded)
 - `memory.db` — SQLite database (currently empty in observed installs)
 - `sessions.db` — session history SQLite database (large)
 - `.recovery-*` — automatic backup snapshots of the markdown files
-- `.retired-*` — retired/consolidated memory entries
+- `.<base>.retired-*` — retired/consolidated memory entries
 - `.consolidation-locks/` — consolidation lock SQLite database
+- `.cleanup-backups/` — backups created by this project's dedupe command
+
+Entry format and recovery filename grammar are documented in `.pi/agents.md` (Hermes Data Layout).
 
 ## Related Projects
 
