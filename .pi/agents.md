@@ -89,6 +89,7 @@ This package's pi command surface belongs to the **pi-hermes-memory `memory-*` f
 | `src/backup.ts` | Backup-before-mutation into `.cleanup-backups/` |
 | `src/dedupe.ts` | Duplicate/superseded entry removal (plan/execute) |
 | `src/limits.ts` | Hermes injection caps (hermes-memory-config.json) vs usage |
+| `src/inject.ts` | Mode-aware per-request injection measurement (policy prompt + standing vs full-file inject) |
 | `src/trim.ts` | Arbitrary entry-pick removal planning (never blanks a file) |
 | `src/cli.ts` | `report` / `limits` / `trim` / `prune` / `dedupe` subcommands |
 | `extensions/pi-hermes-memory-cleanup.ts` | `/memory-cleanup` pi command (memory-* family) wrapping the CLI, with interactive menu (Report / Limits / Trim / Dedupe / Prune) |

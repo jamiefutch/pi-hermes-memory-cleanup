@@ -7,6 +7,7 @@ import { planRecoveryPrune, executePrune } from './prune.js';
 import { planDedupe, executeDedupe, parseEntryRef, type EntryRef } from './dedupe.js';
 import { loadHermesLimits, computeUsage, hermesConfigPath } from './limits.js';
 import { planTrim, entriesByCost } from './trim.js';
+import { measureInjection } from './inject.js';
 
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -54,7 +55,22 @@ function printEntriesSection(lines: string[], root: string): MemoryEntry[] {
   const { entries, perFile } = parseHermesFiles(markdownFiles);
 
   lines.push('');
-  lines.push('Memory entries:');
+  lines.push('Per-request injection (what the model actually receives):');
+  const limits = loadHermesLimits();
+  const stats = analyzeHermesStorage(root);
+  const inj = measureInjection(root, limits, {
+    memoryMd: stats.activeFiles.memoryMd,
+    userMd: stats.activeFiles.userMd,
+    failuresMd: stats.activeFiles.failuresMd,
+  });
+  lines.push(`  mode: ${inj.mode} · policy style: ${inj.policyStyle}`);
+  if (inj.policyPromptTokens > 0) lines.push(`  policy prompt: ~${inj.policyPromptTokens} tokens`);
+  if (inj.standingTokens > 0) lines.push(`  standing instructions: ~${inj.standingTokens} tokens`);
+  if (inj.fileTokens > 0) lines.push(`  file contents: ~${inj.fileTokens} tokens`);
+  lines.push(`  TOTAL per request: ~${inj.totalTokens.toLocaleString()} tokens`);
+  lines.push(`  (${inj.filesNote})`);
+  lines.push('');
+  lines.push('Memory files on disk:');
   if (entries.length === 0) {
     lines.push('  (none found)');
     return [];
@@ -67,7 +83,7 @@ function printEntriesSection(lines: string[], root: string): MemoryEntry[] {
     );
     totalTokens += info.estTokens;
   }
-  lines.push(`  Total injected context: ~${totalTokens.toLocaleString()} tokens`);
+  lines.push(`  File contents total: ~${totalTokens.toLocaleString()} tokens (${inj.fileTokens > 0 ? 'injected every request' : 'tool-searchable, not injected'})`);
   lines.push('');
 
   const stale = [...entries]
@@ -241,6 +257,13 @@ export function runLimits(): string {
   lines.push('failures.md injection filter:');
   lines.push(`  max age:     ${limits.failureInjectionMaxAgeDays} days`);
   lines.push(`  max entries: ${limits.failureInjectionMaxEntries}`);
+  lines.push('');
+  const inj = measureInjection(root, limits, {
+    memoryMd: stats.activeFiles.memoryMd,
+    userMd: stats.activeFiles.userMd,
+    failuresMd: stats.activeFiles.failuresMd,
+  });
+  lines.push(`Per-request injection: ~${inj.totalTokens.toLocaleString()} tokens (${inj.filesNote})`);
   lines.push('');
   lines.push('Edit the config file to tune; defaults are 5000 chars per file.');
   return lines.join('\n');

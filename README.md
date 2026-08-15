@@ -73,7 +73,8 @@ All mutating commands are **dry-run by default** and require `--confirm`. `dedup
 `npm start` (read-only) prints:
 
 - **Storage stats** — sizes of `MEMORY.md`, `USER.md`, `failures.md`, recovery/retired backup files, and the SQLite databases
-- **Memory entries** — per-file entry counts, bytes, and estimated injected-context tokens (~4 chars/token)
+- **Per-request injection** — what the model actually receives every request, computed from your Hermes mode: `policy-only` injects just the policy prompt + standing instructions (markdown files are tool-searchable, zero per-request cost); `legacy-inject` injects full file contents
+- **Memory files on disk** — per-file entry counts, bytes, and estimated tokens, labeled injected vs. tool-searchable per your mode
 - **Stalest entries** — the five entries with the oldest `last=` activity dates
 - **Largest entries** — the five entries with the highest estimated token cost
 - **Duplicates** — exact duplicates (identical normalized text) and near-duplicates (Jaccard/overlap similarity ≥ 0.6 with ≥ 5 shared tokens)
