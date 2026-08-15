@@ -132,14 +132,14 @@ export function printStats(): string {
   return lines.join('\n');
 }
 
-interface CliArgs {
+export interface CliArgs {
   readonly command: string;
   readonly confirm: boolean;
   readonly keep: number;
   readonly remove: readonly string[];
 }
 
-function parseArgs(argv: readonly string[]): CliArgs {
+export function parseArgs(argv: readonly string[]): CliArgs {
   const args = [...argv];
   const command = args[0] && !args[0].startsWith('-') ? (args.shift() as string) : 'report';
   let keep = 10;
@@ -155,7 +155,7 @@ function parseArgs(argv: readonly string[]): CliArgs {
   return { command, confirm, keep: Number.isFinite(keep) && keep >= 0 ? keep : 10, remove };
 }
 
-function runPrune(args: CliArgs): string {
+export function runPrune(args: CliArgs): string {
   const root = getHermesRoot();
   const plan = planRecoveryPrune(root, args.keep);
   const lines: string[] = [];
@@ -175,7 +175,7 @@ function runPrune(args: CliArgs): string {
   return lines.join('\n');
 }
 
-function runDedupe(args: CliArgs): string {
+export function runDedupe(args: CliArgs): string {
   const root = getHermesRoot();
   const files = listHermesFiles(root);
   const markdownFiles = [files.memoryMd, files.userMd, files.failuresMd];

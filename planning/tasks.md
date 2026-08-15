@@ -35,5 +35,11 @@
 
 - [x] Add npm scripts for report and cleanup
 - [x] Document commands in README
-- [ ] Add tests for all public functions
-- [ ] Ensure all destructive operations require explicit confirmation
+- [x] Add tests for all public functions
+- [x] Ensure all destructive operations require explicit confirmation
+
+## Phase 5: Pi Extension
+
+- [x] `/hermes-cleanup` command (report / prune / dedupe passthrough)
+- [x] Manifest + settings wiring verified (extension loads at pi startup)
+- [ ] Publish to npm

@@ -80,6 +80,17 @@ All mutating commands are **dry-run by default** and require `--confirm`. `dedup
 
 Entries are parsed from the standard Hermes markdown format: text blocks separated by `§` lines, with optional `<!-- created=YYYY-MM-DD, last=YYYY-MM-DD -->` metadata trailers.
 
+## Pi Extension
+
+Install the package (or keep the local path in `settings.json`) and use inside pi:
+
+```
+/hermes-cleanup                        show the full report in the TUI
+/hermes-cleanup prune --keep 5         dry-run recovery prune
+/hermes-cleanup prune --confirm        delete old recovery files
+/hermes-cleanup dedupe --confirm       back up + remove duplicate/superseded entries
+```
+
 ## License
 
 MIT
