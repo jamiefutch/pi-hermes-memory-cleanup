@@ -87,6 +87,8 @@ Entries are parsed from the standard Hermes markdown format: text blocks separat
 
 Install the package (or keep the local path in `settings.json`) and use inside pi:
 
+The menu tags each operation by blast radius: **⚡ affects injected context** (trim, dedupe), **💽 disk only** (prune), untagged entries are read-only views.
+
 ```
 /memory-cleanup                        interactive menu (report / limits / trim / dedupe / prune)
 /memory-cleanup report                 show the full report in the TUI

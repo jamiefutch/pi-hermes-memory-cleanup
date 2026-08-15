@@ -49,15 +49,18 @@ function runDirect(args: string, ctx: any): void {
 
 async function showMenu(ctx: any): Promise<void> {
 	while (true) {
-		const choice = await ctx.ui.select("Hermes Memory Cleanup", [
-			"📊 Report — storage, entries, tokens, duplicates",
-			"📏 Limits — configured injection caps vs usage",
-			"✂️  Trim entries — pick entries to stop injecting",
-			"🔁 Dedupe entries — remove exact dupes + superseded",
-			"🧹 Prune recovery files — keep newest 10 per file",
-			"❓ Help",
-			"← Exit",
-		]);
+		const choice = await ctx.ui.select(
+			"Hermes Memory Cleanup — ⚡ affects injected context · 💽 disk only · untagged = read-only",
+			[
+				"📊 Report — storage, entries, tokens, duplicates",
+				"📏 Limits — configured injection caps vs usage",
+				"✂️  Trim entries ⚡ — pick entries to stop injecting",
+				"🔁 Dedupe entries ⚡ — remove exact dupes + superseded",
+				"🧹 Prune recovery files 💽 — keep newest 10 per file",
+				"❓ Help",
+				"← Exit",
+			],
+		);
 
 		if (!choice || choice.startsWith("←")) return;
 
@@ -154,6 +157,8 @@ function previewOf(text: string, max = 55): string {
 }
 
 const HELP = `Hermes Memory Cleanup
+
+Menu tags:  ⚡ affects injected context · 💽 disk only · untagged = read-only
 
 Report  — storage sizes, entry counts, estimated injected tokens,
           largest entries, stalest entries, duplicates, superseded.
