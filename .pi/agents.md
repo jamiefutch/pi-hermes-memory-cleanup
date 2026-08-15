@@ -67,6 +67,16 @@ Any cleanup script MUST:
 
 Manual removal of `.recovery-*` / `.retired-*` files outside the CLI requires an explicit user request.
 
+## Command Organization (spec going forward)
+
+This package's pi command surface belongs to the **pi-hermes-memory `memory-*` family**. Consistency rules:
+
+1. **Namespace**: all commands are named `memory-<verb>` (e.g. `memory-cleanup`). Never introduce a `hermes-*` or other prefix — the palette groups by prefix, and the sibling package pi-hermes-memory owns `memory-*` (`memory-consolidate`, `memory-insights`, `memory-pin`, `memory-skills`, `memory-interview`, `memory-preview-context`, `memory-index-sessions`, `memory-switch-project`).
+2. **One command per package feature**: this package registers exactly one command, `memory-cleanup`. Sub-operations (report / prune / dedupe) are exposed two ways — an interactive `ctx.ui.select` menu when invoked with no args in the TUI, and arg passthrough (`/memory-cleanup prune --confirm`) for scripted use. Do not register additional top-level commands without a user request.
+3. **Menu = operations list**: when a new operation is added to the CLI, add a matching entry to the extension menu and the HELP text in the same commit.
+4. **Descriptions**: one sentence, imperative, matching family tone (e.g. "Audit and safely clean Hermes memory storage (report, prune, dedupe)").
+5. **Docs in lockstep**: any command/menu change updates README.md (Pi Extension section), the architecture table below, and `planning/tasks.md`.
+
 ## Current Architecture
 
 | Module | Purpose |
