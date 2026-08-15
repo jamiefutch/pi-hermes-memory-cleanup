@@ -39,8 +39,23 @@ Use this as the source of truth for how Hermes stores, consolidates, and loads m
 # Install dependencies
 npm install
 
-# Run the analysis report against ~/.pi/agent/pi-hermes-memory
+# Read-only report against ~/.pi/agent/pi-hermes-memory
 npm start
+
+# Preview recovery-file pruning (keeps newest 10 per file)
+npm run prune
+
+# Actually prune (dry-run is the default; --confirm mutates)
+npx tsx src/cli.ts prune --confirm --keep 5
+
+# Preview duplicate/superseded entry removal
+npm run dedupe
+
+# Apply removal (backs up affected files first)
+npx tsx src/cli.ts dedupe --confirm
+
+# Manually remove specific entries by ref
+npx tsx src/cli.ts dedupe --confirm --remove MEMORY.md#3 --remove USER.md#1
 
 # Run tests
 npm test
@@ -48,6 +63,10 @@ npm test
 # Type check
 npm run typecheck
 ```
+
+## Safety
+
+All mutating commands are **dry-run by default** and require `--confirm`. `dedupe --confirm` copies affected markdown files to `~/.pi/agent/pi-hermes-memory/.cleanup-backups/<timestamp>/` before rewriting, and never empties a file entirely. `prune` only touches `.recovery-*` files and always keeps the newest N per base file. Every command prints a before/after summary with bytes freed.
 
 ## Report Output
 

@@ -25,15 +25,15 @@
 
 ## Phase 3: Safe Cleanup Tools
 
-- [ ] Implement dry-run analysis mode
-- [ ] Implement backup before mutation
-- [ ] Implement duplicate removal with confirmation
-- [ ] Implement old recovery file archival (optional)
-- [ ] Report bytes and tokens saved
+- [x] Implement dry-run analysis mode
+- [x] Implement backup before mutation
+- [x] Implement duplicate removal with confirmation
+- [x] Implement old recovery file archival (prune keeps newest N, `--confirm` required)
+- [x] Report bytes and tokens saved
 
 ## Phase 4: Integration
 
-- [ ] Add npm scripts for report and cleanup
-- [ ] Document commands in README
+- [x] Add npm scripts for report and cleanup
+- [x] Document commands in README
 - [ ] Add tests for all public functions
 - [ ] Ensure all destructive operations require explicit confirmation

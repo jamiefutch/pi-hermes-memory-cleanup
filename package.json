@@ -19,6 +19,9 @@
   "files": ["extensions", "src", "LICENSE", "README.md"],
   "scripts": {
     "start": "tsx src/cli.ts",
+    "report": "tsx src/cli.ts report",
+    "prune": "tsx src/cli.ts prune",
+    "dedupe": "tsx src/cli.ts dedupe",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
